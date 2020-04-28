@@ -1,24 +1,21 @@
 package by.bsu.famcs.control;
 
 import by.bsu.famcs.entity.User;
+import by.bsu.famcs.service.ExceptionHandler;
 import by.bsu.famcs.utils.AppProperties;
 import de.jensd.fx.glyphs.octicons.OctIcon;
 import de.jensd.fx.glyphs.octicons.OctIconView;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Paint;
 import org.kohsuke.github.GHRepository;
 
-import java.io.IOException;
-import java.net.URL;
 import java.util.Map;
-import java.util.ResourceBundle;
 
-public class RepositoryController implements Initializable {
+public class RepositoryController {
 
     @FXML
     private Label lblRepoName, lblRepoDesc, lblFork;
@@ -28,11 +25,9 @@ public class RepositoryController implements Initializable {
 
     private GHRepository repository;
 
-    private Map<String, GHRepository> repositoryMap;
-
-    @Override
-    public void initialize(URL location, ResourceBundle resources) {
-        repositoryMap = User.getRepositories();
+    @FXML
+    public void setSelectedRepository(MouseEvent event) {
+        User.setSelectedRepository(repository);
     }
 
     public void setRepository(GHRepository repo) {
@@ -59,36 +54,29 @@ public class RepositoryController implements Initializable {
         }
     }
 
-    public Map<String, GHRepository> getRepositoryMap() {
-        return repositoryMap;
-    }
-
-    public void setRepositoryMap(Map<String, GHRepository> repositoryMap) {
-        this.repositoryMap = repositoryMap;
-    }
-
-    public void loadRepositories(VBox vBox, String filter) throws IOException {
-        vBox.getChildren().clear();
-        for (String key : repositoryMap.keySet()) {
-            GHRepository repo = repositoryMap.get(key);
-            if (repo != null) {
-                if (filter != null) {
-                    String name = repo.getName().toLowerCase();
-                    if (!name.contains(filter)) {
-                        continue;
+    public void loadRepositories(VBox vBox, String filter) {
+        try {
+            Map<String, GHRepository> repositoryMap = User.getRepositories();
+            vBox.getChildren().clear();
+            for (String key : repositoryMap.keySet()) {
+                GHRepository repo = repositoryMap.get(key);
+                if (repo != null) {
+                    if (filter != null) {
+                        String name = repo.getName().toLowerCase();
+                        if (!name.contains(filter)) {
+                            continue;
+                        }
                     }
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource(AppProperties.FXML_REPO_ITEM));
+                    RepositoryController repositoryController = new RepositoryController();
+                    loader.setController(repositoryController);
+                    vBox.getChildren().add(loader.load());
+                    repositoryController.setRepository(repo);
                 }
-                FXMLLoader loader = new FXMLLoader(getClass().getResource(AppProperties.FXML_REPO_ITEM));
-                RepositoryController controller = new RepositoryController();
-                loader.setController(controller);
-                vBox.getChildren().add(loader.load());
-                controller.setRepository(repo);
             }
+        } catch (Exception e) {
+            e.printStackTrace();
+            ExceptionHandler.showException("Could not load repositories.", e);
         }
-    }
-
-    @FXML
-    public void setSelectedRepository(ActionEvent event) {
-        HomeController.setSelectedRepository(repository);
     }
 }

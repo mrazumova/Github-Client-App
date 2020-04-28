@@ -8,7 +8,6 @@ import com.jfoenix.controls.JFXButton;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
@@ -45,13 +44,19 @@ public class HomeController implements Initializable {
     private VBox vbRepository, vbFollowers, vbFollowing;
 
     @FXML
-    private Label lblRepoName, lblPrivate, lblRepoLanguage;
+    private Label lblRepoName;
+    @FXML
+    private Label lblPrivate;
+    @FXML
+    private Label lblRepoLanguage;
 
     @FXML
     private Label lblRepoDesc, lblRepoCreation, lblBranches;
 
     @FXML
-    private JFXButton btnDeleteRepo, btnBrowser;
+    private JFXButton btnDeleteRepo;
+    @FXML
+    private JFXButton btnBrowser;
 
     @FXML
     private TextField searchField;
@@ -60,11 +65,23 @@ public class HomeController implements Initializable {
 
     private FollowsController followingController;
 
-    private GHRepository cachedRepository;
-
-    private static GHRepository selectedRepository;
+    private RepositoryController repositoryController;
 
     private Loader loader;
+
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        loader = new Loader();
+        followersController = new FollowsController();
+        followingController = new FollowsController();
+        repositoryController = new RepositoryController();
+        clearDetails();
+        loadUserInfo();
+        repositoryController.loadRepositories(vbRepository, null);
+        followersController.loadFollows(vbFollowers, User.getFollowers());
+        followingController.loadFollows(vbFollowing, User.getFollowing());
+        showRepositoryInfo();
+    }
 
     @FXML
     private void closeWindow(MouseEvent event) {
@@ -91,12 +108,12 @@ public class HomeController implements Initializable {
         alert.setContentText("Do you want to delete this repository?");
         Optional<ButtonType> result = alert.showAndWait();
         if (result.get() == ButtonType.OK) {
-            GHRepository selected = cachedRepository;
+            GHRepository selected = User.getSelectedRepository();
             if (selected != null) try {
                 selected.delete();
                 clearDetails();
                 User.removeRepository();
-                loadRepositories(null);
+                repositoryController.loadRepositories(vbRepository, null);
             } catch (IOException ex) {
                 ExceptionHandler.showException("Error: couldn't delete this repository.", ex);
             }
@@ -108,17 +125,13 @@ public class HomeController implements Initializable {
         loader.openWebBrowser(
                 AppProperties.GITHUB_OPEN_REPOSITORY
                         .replace("login", User.getLogin())
-                        .replace("repository", cachedRepository.getName()));
+                        .replace("repository", User.getSelectedRepository().getName()));
     }
 
     @FXML
     private void reloadRepositories(KeyEvent event) {
         String search = searchField.getText().trim().toLowerCase();
-        try {
-            loadRepositories(search);
-        } catch (IOException ex) {
-            ExceptionHandler.showException("Could not load repositories.", ex);
-        }
+        repositoryController.loadRepositories(vbRepository, search);
     }
 
     @FXML
@@ -126,82 +139,40 @@ public class HomeController implements Initializable {
         //TODO
     }
 
-    @Override
-    public void initialize(URL location, ResourceBundle resources) {
-        loader = new Loader();
-        followersController = new FollowsController();
-        followingController = new FollowsController();
-        clearDetails();
-        try {
-            loadUserInfo();
-            loadRepositories( null);
-            followersController.loadFollows(vbFollowers, User.getFollowers());
-            followingController.loadFollows(vbFollowing, User.getFollowing());
-        } catch (IOException ex) {
-            ExceptionHandler.showException("Could not load user info.", ex);
-        }
-        initHandler();
-    }
-
-    private void loadUserInfo() throws IOException {
-        String name = User.getName();
-        lblName.setText(name);
-        lblUsername.setText("@" + User.getLogin());
-        imAvatar.setImage(User.getAvatar());
-        avatarPane.setMinWidth(User.getAvatar().getRequestedWidth());
-        avatarPane.setMaxWidth(User.getAvatar().getRequestedWidth());
-    }
-
-    public static void setSelectedRepository(GHRepository selectedRepository) {
-        HomeController.selectedRepository = selectedRepository;
-    }
-
-    private void initHandler() {
-        Timeline timeline = new Timeline(new KeyFrame(Duration.millis(100), (event) -> {
-            GHRepository selected = selectedRepository;
-            if (selected != null) try {
-                cachedRepository = selectedRepository;
-                btnDeleteRepo.setDisable(false);
-                btnBrowser.setDisable(false);
-                lblRepoName.setText(selected.getName());
-                lblRepoLanguage.setText(selected.getLanguage());
-                lblBranches.setText(String.valueOf(selected.getBranches().size()));
-                String desc = selected.getDescription();
-                lblRepoDesc.setText("No description is available.");
-                if (desc != null && !desc.isEmpty()) {
-                    lblRepoDesc.setText(desc);
+    private void showRepositoryInfo() {
+        Timeline timeline = new Timeline(new KeyFrame(Duration.millis(100), event -> {
+            try {
+                GHRepository selectedRepository = User.getSelectedRepository();
+                if (selectedRepository != null && !selectedRepository.getName().equals(lblRepoName.getText())){
+                    btnDeleteRepo.setDisable(false);
+                    btnBrowser.setDisable(false);
+                    lblRepoName.setText(selectedRepository.getName());
+                    lblRepoLanguage.setText(selectedRepository.getLanguage());
+                    lblBranches.setText(String.valueOf(selectedRepository.getBranches().size()));
+                    String desc = selectedRepository.getDescription();
+                    lblRepoDesc.setText("No description is available.");
+                    if (desc != null && !desc.isEmpty()) {
+                        lblRepoDesc.setText(desc);
+                    }
+                    lblPrivate.setText(selectedRepository.isPrivate() ? "Private" : "Public");
+                    String createdAt = selectedRepository.getCreatedAt().toString();
+                    lblRepoCreation.setText(createdAt.substring(0, 11) + createdAt.substring(24, 28));
                 }
-                lblPrivate.setText(selected.isPrivate() ? "Private" : "Public");
-                String createdAt = selected.getCreatedAt().toString();
-                lblRepoCreation.setText(createdAt.substring(0, 11) + createdAt.substring(24, 28));
             } catch (IOException e) {
-                ExceptionHandler.showException("Error: loading repository details.", e);
-            } finally {
-                selectedRepository = null;
+                ExceptionHandler.showException("Cannot load repository details.", e);
             }
         }));
+
         timeline.setCycleCount(Timeline.INDEFINITE);
         timeline.play();
     }
 
-    private void loadRepositories(String filter) throws IOException {
-        vbRepository.getChildren().clear();
-        for (String key : User.getRepositories().keySet()) {
-            GHRepository repo = User.getRepositories().get(key);
-            if (repo != null) {
-                if (filter != null) {
-                    String name = repo.getName().toLowerCase();
-                    if (!name.contains(filter)) {
-                        continue;
-                    }
-                }
-                FXMLLoader loader = new FXMLLoader(getClass().getResource(AppProperties.FXML_REPO_ITEM));
-                RepositoryController controller = new RepositoryController();
-                loader.setController(controller);
-                vbRepository.getChildren().add(loader.load());
-                controller.setRepository(repo);
-            }
-        }
+    private void loadUserInfo() {
+        lblName.setText(User.getName());
+        lblUsername.setText("@" + User.getLogin());
+        imAvatar.setImage(User.getAvatar());
+        avatarPane.setMinWidth(User.getAvatar().getRequestedWidth());
+        avatarPane.setMaxWidth(User.getAvatar().getRequestedWidth());
     }
 
     private void clearDetails() {
@@ -212,8 +183,6 @@ public class HomeController implements Initializable {
         lblBranches.setText("");
         btnDeleteRepo.setDisable(true);
         btnBrowser.setDisable(true);
-        selectedRepository = null;
-        cachedRepository = null;
+        repositoryController.setSelectedRepository(null);
     }
-
 }

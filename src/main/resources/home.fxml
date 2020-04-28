@@ -66,7 +66,8 @@
                                     <ScrollPane layoutX="14.0" layoutY="90.0" prefHeight="370.0" prefWidth="300.0">
                                        <content>
                                           <VBox fx:id="vbRepository" prefHeight="368.0" prefWidth="285.0" />
-                                       </content></ScrollPane>
+                                       </content>
+                                    </ScrollPane>
                                     <Pane layoutX="325.0" layoutY="14.0" prefHeight="220.0" prefWidth="560.0" style="-fx-border-color: #c8c8c8;">
                                        <children>
                                           <Label graphicTextGap="15.0" layoutX="14.0" layoutY="14.0" text="Details">

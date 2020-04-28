@@ -21,6 +21,8 @@ public class User {
 
     private static Map<String, GHRepository> repositoryMap;
 
+    private static GHRepository selectedRepository;
+
     public static void setUser(GHUser ghUser) {
         githubUser = ghUser;
         setName();
@@ -55,6 +57,14 @@ public class User {
 
     public static void removeRepository(){
         setRepositories();
+    }
+
+    public static void setSelectedRepository(GHRepository repository){
+        User.selectedRepository = repository;
+    }
+
+    public static GHRepository getSelectedRepository() {
+        return selectedRepository;
     }
 
     private static void setName() {

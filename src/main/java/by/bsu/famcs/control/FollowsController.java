@@ -1,6 +1,7 @@
 package by.bsu.famcs.control;
 
 import by.bsu.famcs.entity.User;
+import by.bsu.famcs.service.ExceptionHandler;
 import by.bsu.famcs.utils.AppProperties;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -26,13 +27,17 @@ public class FollowsController {
     @FXML
     private Button btnFollow;
 
-    public void loadFollows(VBox vBox, GHPersonSet<GHUser> follows) throws IOException {
-        vBox.getChildren().clear();
-        for (GHUser following : follows){
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(AppProperties.FXML_FOLLOWS_ITEM));
-            loader.setController(this);
-            vBox.getChildren().add(loader.load());
-            setFollows(following);
+    public void loadFollows(VBox vBox, GHPersonSet<GHUser> follows) {
+        try {
+            vBox.getChildren().clear();
+            for (GHUser following : follows) {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource(AppProperties.FXML_FOLLOWS_ITEM));
+                loader.setController(this);
+                vBox.getChildren().add(loader.load());
+                setFollows(following);
+            }
+        } catch (Exception e) {
+            ExceptionHandler.showException("Could not load followers & following info.", e);
         }
     }
 
