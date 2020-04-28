@@ -25,10 +25,12 @@ public class User {
 
     public static void setUser(GHUser ghUser) {
         githubUser = ghUser;
-        setName();
-        setRepositories();
-        setFollowers();
-        setFollowing();
+        if (githubUser != null){
+            setName();
+            setRepositories();
+            setFollowers();
+            setFollowing();
+        }
     }
 
     public static String getName() {

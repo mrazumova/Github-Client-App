@@ -146,7 +146,7 @@ public class HomeController implements Initializable {
                     .setDirectory(new File(selectedDirectory.getAbsolutePath() + "/" + repositoryName))
                     .call();
         } catch (Exception e){
-            e.printStackTrace();
+            ExceptionHandler.showException("Cannot clone repository.", e);
         }
     }
 

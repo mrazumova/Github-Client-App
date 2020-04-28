@@ -75,7 +75,6 @@ public class RepositoryController {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
             ExceptionHandler.showException("Could not load repositories.", e);
         }
     }

@@ -9,7 +9,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import org.kohsuke.github.GHPersonSet;
 import org.kohsuke.github.GHUser;
@@ -27,14 +26,17 @@ public class FollowsController {
     @FXML
     private Button btnFollow;
 
+    private GHUser follow;
+
     public void loadFollows(VBox vBox, GHPersonSet<GHUser> follows) {
         try {
             vBox.getChildren().clear();
             for (GHUser following : follows) {
                 FXMLLoader loader = new FXMLLoader(getClass().getResource(AppProperties.FXML_FOLLOWS_ITEM));
-                loader.setController(this);
+                FollowsController controller = new FollowsController();
+                loader.setController(controller);
                 vBox.getChildren().add(loader.load());
-                setFollows(following);
+                controller.setFollows(following);
             }
         } catch (Exception e) {
             ExceptionHandler.showException("Could not load followers & following info.", e);
@@ -42,16 +44,12 @@ public class FollowsController {
     }
 
     private void setFollows(GHUser follower) throws IOException {
+        follow = follower;
         String name = (follower.getName() != null && !follower.getName().isEmpty() ? follower.getName() : follower.getLogin());
         lblName.setText(name);
         lblUsername.setText("@" + follower.getLogin());
         Image image = new Image(follower.getAvatarUrl());
         imAvatar.setImage(image);
-        btnFollow.setText(User.getFollowers().contains(follower) ? "Unfollow" : "Follow");
-    }
-
-    @FXML
-    private void followUser(MouseEvent event) {
-        //TODO
+        btnFollow.setText(User.getFollowing().contains(follower) ? "Unfollow" : "Follow");
     }
 }
