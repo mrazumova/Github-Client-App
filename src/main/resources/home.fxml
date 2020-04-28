@@ -1,23 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import com.jfoenix.controls.JFXButton?>
-<?import com.jfoenix.controls.JFXTabPane?>
+<?import com.jfoenix.controls.*?>
 <?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
 <?import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView?>
 <?import de.jensd.fx.glyphs.octicons.OctIconView?>
-<?import javafx.scene.Cursor?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.control.Separator?>
-<?import javafx.scene.control.Tab?>
-<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.*?>
 <?import javafx.scene.image.ImageView?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.Pane?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
-
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 <AnchorPane id="AnchorPane" prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="by.bsu.famcs.control.HomeController">
    <children>
       <BorderPane prefHeight="600.0" prefWidth="900.0">
@@ -136,7 +127,7 @@
                                                 <Font name="Segoe UI" size="16.0" />
                                              </font>
                                           </Label>
-                                          <JFXButton fx:id="btnBrowser" disable="true" graphicTextGap="6.0" layoutX="354.0" layoutY="16.0" onMouseClicked="#openRepo" prefHeight="29.0" prefWidth="160.0" style="-fx-background-color: #fac84e;" text="Open in Web Browser" textFill="WHITE">
+                                          <JFXButton fx:id="btnBrowser" disable="true" graphicTextGap="6.0" layoutX="354.0" layoutY="16.0" onMouseClicked="#openRepository" prefHeight="29.0" prefWidth="160.0" style="-fx-background-color: #fac84e;" text="Open in Web Browser" textFill="WHITE">
                                              <cursor>
                                                 <Cursor fx:constant="HAND" />
                                              </cursor>

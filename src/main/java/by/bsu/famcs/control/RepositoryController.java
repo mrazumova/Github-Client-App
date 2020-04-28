@@ -1,6 +1,6 @@
 package by.bsu.famcs.control;
 
-import by.bsu.famcs.service.ExceptionHandler;
+import by.bsu.famcs.entity.User;
 import by.bsu.famcs.utils.AppProperties;
 import de.jensd.fx.glyphs.octicons.OctIcon;
 import de.jensd.fx.glyphs.octicons.OctIconView;
@@ -15,7 +15,6 @@ import org.kohsuke.github.GHRepository;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
 
@@ -33,11 +32,7 @@ public class RepositoryController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        try {
-            repositoryMap = new HashMap<>(LoginController.getGithubUser().getRepositories());
-        } catch (IOException e) {
-            ExceptionHandler.showException("Could not load repositories.", e);
-        }
+        repositoryMap = User.getRepositories();
     }
 
     public void setRepository(GHRepository repo) {

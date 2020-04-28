@@ -1,7 +1,9 @@
 package by.bsu.famcs.control;
 
-import by.bsu.famcs.utils.AppProperties;
+import by.bsu.famcs.entity.User;
 import by.bsu.famcs.service.ExceptionHandler;
+import by.bsu.famcs.service.Loader;
+import by.bsu.famcs.utils.AppProperties;
 import com.jfoenix.controls.JFXButton;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -9,39 +11,26 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import org.kohsuke.github.GHPerson;
-import org.kohsuke.github.GHPersonSet;
 import org.kohsuke.github.GHRepository;
-import org.kohsuke.github.GHUser;
 
-import java.awt.*;
 import java.io.IOException;
-import java.net.URI;
 import java.net.URL;
-import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.Optional;
+import java.util.ResourceBundle;
 
 public class HomeController implements Initializable {
-
-    private FollowsController followersController;
-    private FollowsController followingController;
 
     @FXML
     private Label lblName, lblUsername;
@@ -67,11 +56,15 @@ public class HomeController implements Initializable {
     @FXML
     private TextField searchField;
 
+    private FollowsController followersController;
+
+    private FollowsController followingController;
+
     private GHRepository cachedRepository;
 
     private static GHRepository selectedRepository;
 
-    public Map<String, GHRepository> repositoryMap;
+    private Loader loader;
 
     @FXML
     private void closeWindow(MouseEvent event) {
@@ -87,27 +80,8 @@ public class HomeController implements Initializable {
 
     @FXML
     private void logOut(MouseEvent event) {
-        try {
-            Node node = (Node) event.getSource();
-            Stage stage = (Stage) node.getScene().getWindow();
-            stage.close();
-            URL path = getClass().getResource(AppProperties.FXML_LOGIN);
-            if (path != null) {
-                Parent root = FXMLLoader.load(path);
-
-                LoginController.setGithubUser(null);
-                Scene scene = new Scene(root);
-                scene.setFill(Color.TRANSPARENT);
-
-                stage.setTitle(AppProperties.APP_TITLE);
-                stage.setScene(scene);
-                stage.show();
-            } else {
-                throw new IOException("Error loading login page.");
-            }
-        } catch (IOException e) {
-            ExceptionHandler.showException("There was an error trying to log out.", e);
-        }
+        User.setUser(null);
+        loader.initPage(event, AppProperties.FXML_LOGIN);
     }
 
     @FXML
@@ -121,51 +95,48 @@ public class HomeController implements Initializable {
             if (selected != null) try {
                 selected.delete();
                 clearDetails();
-                repositoryMap = null;
+                User.removeRepository();
                 loadRepositories(null);
             } catch (IOException ex) {
                 ExceptionHandler.showException("Error: couldn't delete this repository.", ex);
-                Logger.getLogger(HomeController.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }
 
     @FXML
-    void openRepo(MouseEvent event) {
-        String uri = "https://github.com/" + LoginController.getGithubUser().getLogin() + "/" + this.cachedRepository.getName();
-        try {
-            Desktop.getDesktop().browse(URI.create(uri));
-        } catch (IOException e) {
-            ExceptionHandler.showException("Error: couldn't open selected repository.", e);
-            Logger.getLogger(HomeController.class.getName()).log(Level.SEVERE, null, e);
-        }
+    private void openRepository(MouseEvent event) {
+        loader.openWebBrowser(
+                AppProperties.GITHUB_OPEN_REPOSITORY
+                        .replace("login", User.getLogin())
+                        .replace("repository", cachedRepository.getName()));
     }
 
     @FXML
-    void reloadRepositories(KeyEvent event) {
+    private void reloadRepositories(KeyEvent event) {
         String search = searchField.getText().trim().toLowerCase();
         try {
             loadRepositories(search);
         } catch (IOException ex) {
-            Logger.getLogger(HomeController.class.getName()).log(Level.SEVERE, null, ex);
+            ExceptionHandler.showException("Could not load repositories.", ex);
         }
     }
 
     @FXML
-    void createNewRepository(MouseEvent event) {
+    private void createNewRepository(MouseEvent event) {
         //TODO
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        loader = new Loader();
         followersController = new FollowsController();
         followingController = new FollowsController();
         clearDetails();
         try {
             loadUserInfo();
             loadRepositories( null);
-            followersController.loadFollows(vbFollowers, LoginController.getFollowers());
-            followingController.loadFollows(vbFollowing, LoginController.getFollowing());
+            followersController.loadFollows(vbFollowers, User.getFollowers());
+            followingController.loadFollows(vbFollowing, User.getFollowing());
         } catch (IOException ex) {
             ExceptionHandler.showException("Could not load user info.", ex);
         }
@@ -173,18 +144,12 @@ public class HomeController implements Initializable {
     }
 
     private void loadUserInfo() throws IOException {
-        GHPerson user = LoginController.getGithubUser();
-        String name = (user.getName() != null && !user.getName().isEmpty() ? user.getName() : "No Name Available");
+        String name = User.getName();
         lblName.setText(name);
-        lblUsername.setText("@" + user.getLogin());
-        Image image = new Image(user.getAvatarUrl());
-        imAvatar.setImage(image);
-        avatarPane.setMinWidth(image.getRequestedWidth());
-        avatarPane.setMaxWidth(image.getRequestedWidth());
-    }
-
-    public static GHRepository getSelectedRepository() {
-        return selectedRepository;
+        lblUsername.setText("@" + User.getLogin());
+        imAvatar.setImage(User.getAvatar());
+        avatarPane.setMinWidth(User.getAvatar().getRequestedWidth());
+        avatarPane.setMaxWidth(User.getAvatar().getRequestedWidth());
     }
 
     public static void setSelectedRepository(GHRepository selectedRepository) {
@@ -220,12 +185,9 @@ public class HomeController implements Initializable {
     }
 
     private void loadRepositories(String filter) throws IOException {
-        if (repositoryMap == null) {
-            repositoryMap = new HashMap<>(LoginController.getGithubUser().getRepositories());
-        }
         vbRepository.getChildren().clear();
-        for (String key : repositoryMap.keySet()) {
-            GHRepository repo = repositoryMap.get(key);
+        for (String key : User.getRepositories().keySet()) {
+            GHRepository repo = User.getRepositories().get(key);
             if (repo != null) {
                 if (filter != null) {
                     String name = repo.getName().toLowerCase();
