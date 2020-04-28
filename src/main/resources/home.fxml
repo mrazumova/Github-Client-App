@@ -110,7 +110,12 @@
                                                 <Font name="Segoe UI" size="16.0" />
                                              </font>
                                           </Label>
-                                          <JFXButton fx:id="btnDeleteRepo" disable="true" layoutX="215.0" layoutY="16.0" onMouseClicked="#deleteRepo" prefHeight="29.0" prefWidth="130.0" style="-fx-background-color: #CC2532;" text="Delete This Repo" textFill="WHITE">
+                                          <JFXButton fx:id="btnClone" disable="true" layoutX="354.0" layoutY="177.0" onMouseClicked="#cloneRepository" prefHeight="29.0" prefWidth="160.0" style="-fx-background-color: #02c4ff;" text="Clone repository" textFill="WHITE">
+                                             <cursor>
+                                                <Cursor fx:constant="HAND" />
+                                             </cursor>
+                                          </JFXButton>
+                                          <JFXButton fx:id="btnDeleteRepo" disable="true" layoutX="215.0" layoutY="16.0" onMouseClicked="#deleteRepo" prefHeight="29.0" prefWidth="130.0" style="-fx-background-color: #CC2532;" text="Delete repository" textFill="WHITE">
                                              <cursor>
                                                 <Cursor fx:constant="HAND" />
                                              </cursor>

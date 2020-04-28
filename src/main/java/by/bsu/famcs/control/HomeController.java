@@ -20,10 +20,13 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import org.eclipse.jgit.api.Git;
 import org.kohsuke.github.GHRepository;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Optional;
@@ -44,19 +47,10 @@ public class HomeController implements Initializable {
     private VBox vbRepository, vbFollowers, vbFollowing;
 
     @FXML
-    private Label lblRepoName;
-    @FXML
-    private Label lblPrivate;
-    @FXML
-    private Label lblRepoLanguage;
+    private Label lblRepoName, lblPrivate, lblRepoLanguage, lblRepoDesc, lblRepoCreation, lblBranches;
 
     @FXML
-    private Label lblRepoDesc, lblRepoCreation, lblBranches;
-
-    @FXML
-    private JFXButton btnDeleteRepo;
-    @FXML
-    private JFXButton btnBrowser;
+    private JFXButton btnDeleteRepo, btnBrowser, btnClone;
 
     @FXML
     private TextField searchField;
@@ -139,13 +133,31 @@ public class HomeController implements Initializable {
         //TODO
     }
 
+    @FXML
+    public void cloneRepository(MouseEvent event) {
+        try{
+            DirectoryChooser directoryChooser = new DirectoryChooser();
+            File selectedDirectory = directoryChooser.showDialog(loader.getStage(event));
+
+            String repositoryName = User.getSelectedRepository().getName();
+
+            Git.cloneRepository()
+                    .setURI("https://github.com/" + User.getLogin() + "/" + repositoryName + ".git")
+                    .setDirectory(new File(selectedDirectory.getAbsolutePath() + "/" + repositoryName))
+                    .call();
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
     private void showRepositoryInfo() {
         Timeline timeline = new Timeline(new KeyFrame(Duration.millis(100), event -> {
             try {
                 GHRepository selectedRepository = User.getSelectedRepository();
-                if (selectedRepository != null && !selectedRepository.getName().equals(lblRepoName.getText())){
+                if (selectedRepository != null && !selectedRepository.getName().equals(lblRepoName.getText())) {
                     btnDeleteRepo.setDisable(false);
                     btnBrowser.setDisable(false);
+                    btnClone.setDisable(false);
                     lblRepoName.setText(selectedRepository.getName());
                     lblRepoLanguage.setText(selectedRepository.getLanguage());
                     lblBranches.setText(String.valueOf(selectedRepository.getBranches().size()));
@@ -183,6 +195,8 @@ public class HomeController implements Initializable {
         lblBranches.setText("");
         btnDeleteRepo.setDisable(true);
         btnBrowser.setDisable(true);
+        btnClone.setDisable(true);
         repositoryController.setSelectedRepository(null);
     }
+
 }

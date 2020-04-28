@@ -36,6 +36,11 @@ public class Loader {
         }
     }
 
+    public Stage getStage (MouseEvent event){
+        Node node = (Node) event.getSource();
+        return (Stage) node.getScene().getWindow();
+    }
+
     public void openWebBrowser(String uri) {
         try {
             Desktop.getDesktop().browse(URI.create(uri));
