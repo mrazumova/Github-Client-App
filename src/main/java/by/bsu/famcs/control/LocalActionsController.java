@@ -1,5 +1,6 @@
 package by.bsu.famcs.control;
 
+import by.bsu.famcs.entity.User;
 import by.bsu.famcs.service.ExceptionHandler;
 import by.bsu.famcs.service.Loader;
 import by.bsu.famcs.utils.AppProperties;
@@ -16,8 +17,8 @@ import javafx.stage.DirectoryChooser;
 import org.eclipse.jgit.api.AddCommand;
 import org.eclipse.jgit.api.CommitCommand;
 import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.attributes.AttributesNodeProvider;
-import org.eclipse.jgit.lib.*;
+import org.eclipse.jgit.api.PushCommand;
+import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 
 import java.io.File;
@@ -72,7 +73,7 @@ public class LocalActionsController {
             String commitMessage = getCommitMessage();
 
             Git git = new Git(repository);
-            CommitCommand commit = git.commit();
+            CommitCommand commit = git.commit().setAll(true);
 
             commit.setMessage(commitMessage).call();
         } catch (Exception e) {
@@ -86,6 +87,9 @@ public class LocalActionsController {
             Repository repository = getRepository(event);
             Git git = new Git(repository);
 
+            PushCommand pushCommand = git.push();
+            pushCommand.setCredentialsProvider(User.getCredentials());
+            pushCommand.call();
         } catch (Exception e) {
             ExceptionHandler.showException("Exception during push to remote repo", e);
         }

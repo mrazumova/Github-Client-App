@@ -39,13 +39,8 @@ public class LoginController implements Initializable {
         if (username.isEmpty() && password.isEmpty()) {
             new Notification("Error!", "Fields cannot be empty.");
         } else {
-            try {
-                GitHub github = new GitHubBuilder().withPassword(username, password).build();
-                User.setUser(github.getMyself());
-                loader.initPage(event, AppProperties.FXML_HOME);
-            } catch (IOException e) {
-                new Notification("Error!", "Invalid username or password.");
-            }
+            User.login(username, password);
+            loader.initPage(event, AppProperties.FXML_HOME);
         }
     }
 

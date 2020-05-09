@@ -1,10 +1,10 @@
 package by.bsu.famcs.entity;
 
 import by.bsu.famcs.service.ExceptionHandler;
+import by.bsu.famcs.service.Notification;
 import javafx.scene.image.Image;
-import org.kohsuke.github.GHPersonSet;
-import org.kohsuke.github.GHRepository;
-import org.kohsuke.github.GHUser;
+import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
+import org.kohsuke.github.*;
 
 import java.io.IOException;
 import java.util.Map;
@@ -12,6 +12,8 @@ import java.util.Map;
 public class User {
 
     private static GHUser githubUser;
+
+    private static UsernamePasswordCredentialsProvider credentialsProvider;
 
     private static String name;
 
@@ -23,9 +25,20 @@ public class User {
 
     private static GHRepository selectedRepository;
 
+    public static void login(String username, String password) {
+        try {
+            GitHub github = new GitHubBuilder().withPassword(username, password).build();
+
+            User.setUser(github.getMyself());
+            credentialsProvider = new UsernamePasswordCredentialsProvider(username, password);
+        } catch (Exception e) {
+            new Notification("Error!", "Invalid username or password.");
+        }
+    }
+
     public static void setUser(GHUser ghUser) {
         githubUser = ghUser;
-        if (githubUser != null){
+        if (githubUser != null) {
             setName();
             setRepositories();
             setFollowers();
@@ -35,6 +48,10 @@ public class User {
 
     public static String getName() {
         return name;
+    }
+
+    public static UsernamePasswordCredentialsProvider getCredentials() {
+        return credentialsProvider;
     }
 
     public static String getLogin() {
@@ -53,15 +70,15 @@ public class User {
         return following;
     }
 
-    public static Map<String, GHRepository> getRepositories(){
+    public static Map<String, GHRepository> getRepositories() {
         return repositoryMap;
     }
 
-    public static void removeRepository(){
+    public static void removeRepository() {
         setRepositories();
     }
 
-    public static void setSelectedRepository(GHRepository repository){
+    public static void setSelectedRepository(GHRepository repository) {
         User.selectedRepository = repository;
     }
 

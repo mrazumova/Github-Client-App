@@ -134,7 +134,7 @@ public class HomeController implements Initializable {
 
     @FXML
     private void createNewRepository(MouseEvent event) {
-        //TODO
+
     }
 
     @FXML
