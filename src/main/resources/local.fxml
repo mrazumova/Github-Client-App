@@ -97,7 +97,7 @@
                 <Font size="14.0"/>
             </font>
         </Label>
-        <Button fx:id="btnLink" layoutX="648.0" layoutY="379.0" text="Push" onMouseClicked="#linkLocalAndRemoteRepositories" mnemonicParsing="false" prefHeight="30.0"
+        <Button fx:id="btnLink" layoutX="648.0" layoutY="379.0" text="Link" onMouseClicked="#linkLocalAndRemoteRepositories" mnemonicParsing="false" prefHeight="30.0"
                 prefWidth="205.0"/>
 
 

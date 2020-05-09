@@ -58,23 +58,6 @@ public class LocalActionsController {
         }
     }
 
-    public void linkLocalAndRemoteRepositories(MouseEvent event) {
-        try{
-            String repositoryName = getNewRepositoryName();
-            Repository repository = getRepository(event);
-            Git git = new Git(repository);
-
-            StoredConfig config = git.getRepository().getConfig();
-            config.setString("remote", "origin", "url",
-                    AppProperties.GITHUB_OPEN_REPOSITORY
-                            .replace("login", User.getLogin())
-                            .replace("repository", repositoryName));
-            config.save();
-        } catch (Exception e){
-            ExceptionHandler.showException("Cannot link to remote repo", e);
-        }
-    }
-
     @FXML
     private void initLocalRepository(MouseEvent event) {
         try {
@@ -127,6 +110,24 @@ public class LocalActionsController {
             add.addFilepattern(fileToAdd.getAbsolutePath()).call();
         } catch (Exception e) {
             ExceptionHandler.showException("Exception occurred during add command", e);
+        }
+    }
+
+    @FXML
+    private void linkLocalAndRemoteRepositories(MouseEvent event) {
+        try{
+            String repositoryName = getNewRepositoryName();
+            Repository repository = getRepository(event);
+            Git git = new Git(repository);
+
+            StoredConfig config = git.getRepository().getConfig();
+            config.setString("remote", "origin", "url",
+                    AppProperties.GITHUB_OPEN_REPOSITORY
+                            .replace("login", User.getLogin())
+                            .replace("repository", repositoryName));
+            config.save();
+        } catch (Exception e){
+            ExceptionHandler.showException("Cannot link to remote repo", e);
         }
     }
 
