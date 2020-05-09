@@ -44,7 +44,7 @@ public class HomeController implements Initializable {
     private Pane avatarPane;
 
     @FXML
-    private VBox vbRepository, vbFollowers, vbFollowing;
+    private VBox vbRepository, vbFollowers, vbFollowing, vbLocalActions;
 
     @FXML
     private Label lblRepoName, lblPrivate, lblRepoLanguage, lblRepoDesc, lblRepoCreation, lblBranches;
@@ -61,6 +61,8 @@ public class HomeController implements Initializable {
 
     private RepositoryController repositoryController;
 
+    private LocalActionsController localActionsController;
+
     private Loader loader;
 
     @Override
@@ -69,11 +71,13 @@ public class HomeController implements Initializable {
         followersController = new FollowsController();
         followingController = new FollowsController();
         repositoryController = new RepositoryController();
+        localActionsController = new LocalActionsController();
         clearDetails();
         loadUserInfo();
         repositoryController.loadRepositories(vbRepository, null);
         followersController.loadFollows(vbFollowers, User.getFollowers());
         followingController.loadFollows(vbFollowing, User.getFollowing());
+        localActionsController.loadActions(vbLocalActions);
         showRepositoryInfo();
     }
 
@@ -134,7 +138,7 @@ public class HomeController implements Initializable {
     }
 
     @FXML
-    public void cloneRepository(MouseEvent event) {
+    private void cloneRepository(MouseEvent event) {
         try{
             DirectoryChooser directoryChooser = new DirectoryChooser();
             File selectedDirectory = directoryChooser.showDialog(loader.getStage(event));
