@@ -82,5 +82,24 @@
         <Button fx:id="btnPush" layoutX="648.0" layoutY="291.0" text="Push" onMouseClicked="#pushToRemoteRepository" mnemonicParsing="false" prefHeight="30.0"
                 prefWidth="205.0"/>
 
+        <Pane layoutX="14.0" layoutY="365.0" prefHeight="75.0" prefWidth="75.0" style="-fx-border-color: black;">
+            <children>
+                <ImageView fx:id="imLink" fitHeight="75.0" fitWidth="75.0" pickOnBounds="true" preserveRatio="true"/>
+            </children>
+        </Pane>
+        <Label fx:id="lblLinkAction" layoutX="108.0" layoutY="365.0" text="Link repositories">
+            <font>
+                <Font size="18.0"/>
+            </font>
+        </Label>
+        <Label fx:id="lblLinkDescription" layoutX="108.0" layoutY="392.0" text="Link local and remote repositories(Select .git directory and enter remote repo name)" opacity="0.6">
+            <font>
+                <Font size="14.0"/>
+            </font>
+        </Label>
+        <Button fx:id="btnLink" layoutX="648.0" layoutY="379.0" text="Push" onMouseClicked="#linkLocalAndRemoteRepositories" mnemonicParsing="false" prefHeight="30.0"
+                prefWidth="205.0"/>
+
+
     </children>
 </AnchorPane>

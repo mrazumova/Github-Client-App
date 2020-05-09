@@ -19,7 +19,10 @@ import org.eclipse.jgit.api.CommitCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.PushCommand;
 import org.eclipse.jgit.lib.Repository;
+import org.eclipse.jgit.lib.StoredConfig;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
+import org.eclipse.jgit.transport.RemoteConfig;
+import org.eclipse.jgit.transport.URIish;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,16 +31,17 @@ import java.util.Optional;
 public class LocalActionsController {
 
     @FXML
-    private ImageView imInit, imCommit, imAdd, imPush;
+    private ImageView imInit, imCommit, imAdd, imPush, imLink;
 
     @FXML
-    private Button btnInit, btnCommit, btnAdd, btnPush;
+    private Button btnInit, btnCommit, btnAdd, btnPush, btnLink;
 
     @FXML
     private Label lblInitAction, lblInitDescription,
             lblCommitAction, lblCommitDescription,
             lblAddAction, lblAddDescription,
-            lblPushAction, lblPushDescription;
+            lblPushAction, lblPushDescription,
+            lblLinkAction, lblLinkDescription;
 
     private Loader loader = new Loader();
 
@@ -51,6 +55,23 @@ public class LocalActionsController {
             controller.loadActions();
         } catch (Exception e) {
             ExceptionHandler.showException("Could not load local actions.", e);
+        }
+    }
+
+    public void linkLocalAndRemoteRepositories(MouseEvent event) {
+        try{
+            String repositoryName = getNewRepositoryName();
+            Repository repository = getRepository(event);
+            Git git = new Git(repository);
+
+            StoredConfig config = git.getRepository().getConfig();
+            config.setString("remote", "origin", "url",
+                    AppProperties.GITHUB_OPEN_REPOSITORY
+                            .replace("login", User.getLogin())
+                            .replace("repository", repositoryName));
+            config.save();
+        } catch (Exception e){
+            ExceptionHandler.showException("Cannot link to remote repo", e);
         }
     }
 
@@ -123,6 +144,20 @@ public class LocalActionsController {
         return "";
     }
 
+    private String getNewRepositoryName() {
+        TextInputDialog dialog = new TextInputDialog("");
+
+        dialog.setTitle("Remote repository name");
+        dialog.setHeaderText("Enter remote repository name:");
+        dialog.setContentText("Name:");
+
+        Optional<String> result = dialog.showAndWait();
+        if (result.isPresent()) {
+            return result.get();
+        }
+        return "";
+    }
+
     private Repository getRepository(MouseEvent event) throws IOException {
         DirectoryChooser directoryChooser = new DirectoryChooser();
         directoryChooser.setTitle("Select repository");
@@ -145,5 +180,6 @@ public class LocalActionsController {
         imCommit.setImage(image);
         imPush.setImage(image);
         imAdd.setImage(image);
+        imLink.setImage(image);
     }
 }

@@ -134,12 +134,11 @@ public class HomeController implements Initializable {
 
     @FXML
     private void createNewRepository(MouseEvent event) {
-
     }
 
     @FXML
     private void cloneRepository(MouseEvent event) {
-        try{
+        try {
             DirectoryChooser directoryChooser = new DirectoryChooser();
             File selectedDirectory = directoryChooser.showDialog(loader.getStage(event));
 
@@ -149,7 +148,7 @@ public class HomeController implements Initializable {
                     .setURI("https://github.com/" + User.getLogin() + "/" + repositoryName + ".git")
                     .setDirectory(new File(selectedDirectory.getAbsolutePath() + "/" + repositoryName))
                     .call();
-        } catch (Exception e){
+        } catch (Exception e) {
             ExceptionHandler.showException("Cannot clone repository.", e);
         }
     }
