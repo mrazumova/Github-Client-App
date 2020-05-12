@@ -21,9 +21,8 @@ import org.eclipse.jgit.api.PushCommand;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.lib.StoredConfig;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
-import org.eclipse.jgit.transport.RemoteConfig;
-import org.eclipse.jgit.transport.URIish;
 
+import javax.jws.soap.SOAPBinding;
 import java.io.File;
 import java.io.IOException;
 import java.util.Optional;
@@ -92,7 +91,7 @@ public class LocalActionsController {
             Git git = new Git(repository);
 
             PushCommand pushCommand = git.push();
-            pushCommand.setCredentialsProvider(User.getCredentials());
+            pushCommand.setCredentialsProvider(User.getCredentialsProvider());
             pushCommand.call();
         } catch (Exception e) {
             ExceptionHandler.showException("Exception during push to remote repo", e);
@@ -115,7 +114,7 @@ public class LocalActionsController {
 
     @FXML
     private void linkLocalAndRemoteRepositories(MouseEvent event) {
-        try{
+        try {
             String repositoryName = getNewRepositoryName();
             Repository repository = getRepository(event);
             Git git = new Git(repository);
@@ -126,7 +125,7 @@ public class LocalActionsController {
                             .replace("login", User.getLogin())
                             .replace("repository", repositoryName));
             config.save();
-        } catch (Exception e){
+        } catch (Exception e) {
             ExceptionHandler.showException("Cannot link to remote repo", e);
         }
     }
@@ -182,5 +181,13 @@ public class LocalActionsController {
         imPush.setImage(image);
         imAdd.setImage(image);
         imLink.setImage(image);
+        if (User.isDemoUser()) {
+            btnInit.setDisable(true);
+            btnAdd.setDisable(true);
+            btnCommit.setDisable(true);
+            btnLink.setDisable(true);
+            btnPush.setDisable(true);
+        }
     }
+
 }

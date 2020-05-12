@@ -45,6 +45,12 @@ public class LoginController implements Initializable {
     }
 
     @FXML
+    private void loginAsDemo(MouseEvent event) {
+        User.setDemoUser();
+        loader.initPage(event, AppProperties.FXML_HOME);
+    }
+
+    @FXML
     private void joinGithub(ActionEvent event) {
         loader.openWebBrowser(AppProperties.GITHUB_JOIN_URL);
     }

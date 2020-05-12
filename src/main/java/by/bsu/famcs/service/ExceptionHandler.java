@@ -10,7 +10,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 
 public class ExceptionHandler {
-    
+
     public static void showException(String header, Exception e) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Oops! An error has occurred.");

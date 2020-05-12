@@ -2,20 +2,25 @@ package by.bsu.famcs.entity;
 
 import by.bsu.famcs.service.ExceptionHandler;
 import by.bsu.famcs.service.Notification;
+import by.bsu.famcs.utils.AppProperties;
 import javafx.scene.image.Image;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.kohsuke.github.*;
 
-import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 
 public class User {
 
-    private static GHUser githubUser;
+    private static String name;
+
+    private static String login;
+
+    private static Image avatar;
+
+    private static boolean isDemoUser;
 
     private static UsernamePasswordCredentialsProvider credentialsProvider;
-
-    private static String name;
 
     private static GHPersonSet<GHUser> followers;
 
@@ -30,91 +35,113 @@ public class User {
             GitHub github = new GitHubBuilder().withPassword(username, password).build();
 
             User.setUser(github.getMyself());
-            credentialsProvider = new UsernamePasswordCredentialsProvider(username, password);
+            setCredentialsProvider(username, password);
         } catch (Exception e) {
             new Notification("Error!", "Invalid username or password.");
         }
     }
 
     public static void setUser(GHUser ghUser) {
-        githubUser = ghUser;
-        if (githubUser != null) {
-            setName();
-            setRepositories();
-            setFollowers();
-            setFollowing();
+        try {
+            if (ghUser != null) {
+                setName(ghUser.getName() != null && !ghUser.getName().isEmpty() ? ghUser.getName() : ghUser.getLogin());
+                setLogin(ghUser.getLogin());
+                setIsDemoUser(false);
+                setRepositories(ghUser.getRepositories());
+                setFollowers(ghUser.getFollowers());
+                setFollowing(ghUser.getFollows());
+                setAvatar(new Image(ghUser.getAvatarUrl()));
+            }
+        } catch (Exception e) {
+            ExceptionHandler.showException("Could not load user info.", e);
         }
+    }
+
+    public static void setDemoUser() {
+        setIsDemoUser(true);
+        setName("Demo user");
+        setLogin("demouser");
+        setRepositories(new HashMap<>());
+        setFollowers(new GHPersonSet<>());
+        setFollowing(new GHPersonSet<>());
+        setAvatar(new Image(AppProperties.FXML_DEMO_PIC));
+        setCredentialsProvider("", "");
+    }
+
+    public static void removeRepository(GHRepository selected) {
+        repositoryMap.remove(selected);
+        setRepositories(repositoryMap);
     }
 
     public static String getName() {
         return name;
     }
 
-    public static UsernamePasswordCredentialsProvider getCredentials() {
-        return credentialsProvider;
+    public static void setName(String name) {
+        User.name = name;
     }
 
     public static String getLogin() {
-        return githubUser.getLogin();
+        return login;
+    }
+
+    public static void setLogin(String login) {
+        User.login = login;
     }
 
     public static Image getAvatar() {
-        return new Image(githubUser.getAvatarUrl());
+        return avatar;
+    }
+
+    public static void setAvatar(Image avatar) {
+        User.avatar = avatar;
+    }
+
+    public static boolean isDemoUser() {
+        return isDemoUser;
+    }
+
+    public static void setIsDemoUser(boolean isDemoUser) {
+        User.isDemoUser = isDemoUser;
+    }
+
+    public static UsernamePasswordCredentialsProvider getCredentialsProvider() {
+        return credentialsProvider;
+    }
+
+    public static void setCredentialsProvider(String usr, String psw) {
+        credentialsProvider = new UsernamePasswordCredentialsProvider(usr, psw);
     }
 
     public static GHPersonSet<GHUser> getFollowers() {
         return followers;
     }
 
+    public static void setFollowers(GHPersonSet<GHUser> followers) {
+        User.followers = followers;
+    }
+
     public static GHPersonSet<GHUser> getFollowing() {
         return following;
+    }
+
+    public static void setFollowing(GHPersonSet<GHUser> following) {
+        User.following = following;
     }
 
     public static Map<String, GHRepository> getRepositories() {
         return repositoryMap;
     }
 
-    public static void removeRepository() {
-        setRepositories();
-    }
-
-    public static void setSelectedRepository(GHRepository repository) {
-        User.selectedRepository = repository;
+    public static void setRepositories(Map<String, GHRepository> repositoryMap) {
+        User.repositoryMap = repositoryMap;
     }
 
     public static GHRepository getSelectedRepository() {
         return selectedRepository;
     }
 
-    private static void setName() {
-        try {
-            name = githubUser.getName() != null && !githubUser.getName().isEmpty() ? githubUser.getName() : githubUser.getLogin();
-        } catch (IOException e) {
-            ExceptionHandler.showException("Could not load user name.", e);
-        }
-    }
-
-    private static void setFollowing() {
-        try {
-            following = githubUser.getFollows();
-        } catch (IOException e) {
-            ExceptionHandler.showException("Could not load following.", e);
-        }
-    }
-
-    private static void setFollowers() {
-        try {
-            followers = githubUser.getFollowers();
-        } catch (IOException e) {
-            ExceptionHandler.showException("Could not load followers.", e);
-        }
-    }
-
-    private static void setRepositories() {
-        try {
-            repositoryMap = githubUser.getRepositories();
-        } catch (IOException e) {
-            ExceptionHandler.showException("Could not load repositories.", e);
-        }
+    public static void setSelectedRepository(GHRepository selectedRepository) {
+        User.selectedRepository = selectedRepository;
     }
 }

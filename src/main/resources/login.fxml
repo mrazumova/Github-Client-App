@@ -55,6 +55,17 @@
                         <Cursor fx:constant="HAND"/>
                     </cursor>
                 </JFXButton>
+                <JFXButton buttonType="RAISED" layoutX="602.0" layoutY="330.0" onMouseClicked="#loginAsDemo"
+                           prefHeight="32.0" prefWidth="150.0" ripplerFill="WHITE"
+                           style="-fx-background-radius: 5; -fx-border-width: 2; -fx-border-radius: 5; -fx-border-color: #44a5f5; -fx-background-color: #44a5f5;"
+                           text="Demo" textFill="WHITE">
+                    <font>
+                        <Font name="Segoe UI Bold" size="14.0"/>
+                    </font>
+                    <cursor>
+                        <Cursor fx:constant="HAND"/>
+                    </cursor>
+                </JFXButton>
                 <Label fx:id="lblError" alignment="CENTER" layoutX="406.0" layoutY="251.0" prefHeight="39.0"
                        prefWidth="212.0" text="¡Revisa tus Credenciales!" textAlignment="CENTER" textFill="RED"
                        visible="false">
@@ -62,14 +73,14 @@
                         <Font name="Segoe UI Bold" size="16.0"/>
                     </font>
                 </Label>
-                <Separator layoutX="452.0" layoutY="377.0" prefWidth="300.0"/>
-                <Label alignment="CENTER" layoutX="538.0" layoutY="369.0" prefHeight="17.0" prefWidth="128.0"
+                <Separator layoutX="452.0" layoutY="385.0" prefWidth="300.0"/>
+                <Label alignment="CENTER" layoutX="538.0" layoutY="389.0" prefHeight="17.0" prefWidth="128.0"
                        style="-fx-background-color: whitesmoke;" text="New to GitHub?" textAlignment="CENTER">
                     <font>
                         <Font name="Segoe UI Bold" size="12.0"/>
                     </font>
                 </Label>
-                <Hyperlink layoutX="540.0" layoutY="401.0" onAction="#joinGithub" text="Create an Account">
+                <Hyperlink layoutX="540.0" layoutY="411.0" onAction="#joinGithub" text="Create an Account">
                     <font>
                         <Font size="14.0"/>
                     </font>

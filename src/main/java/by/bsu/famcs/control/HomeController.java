@@ -74,11 +74,18 @@ public class HomeController implements Initializable {
         localActionsController = new LocalActionsController();
         clearDetails();
         loadUserInfo();
-        repositoryController.loadRepositories(vbRepository, null);
-        followersController.loadFollows(vbFollowers, User.getFollowers());
-        followingController.loadFollows(vbFollowing, User.getFollowing());
         localActionsController.loadActions(vbLocalActions);
-        showRepositoryInfo();
+        if (User.isDemoUser()) {
+            repositoryController.loadDemo(vbRepository);
+            followersController.loadDemo(vbFollowers);
+            followingController.loadDemo(vbFollowing);
+            loadDemoInfo();
+        } else {
+            repositoryController.loadRepositories(vbRepository, null);
+            followersController.loadFollows(vbFollowers, User.getFollowers());
+            followingController.loadFollows(vbFollowing, User.getFollowing());
+            waitForSelect();
+        }
     }
 
     @FXML
@@ -95,7 +102,6 @@ public class HomeController implements Initializable {
 
     @FXML
     private void logOut(MouseEvent event) {
-        User.setUser(null);
         loader.initPage(event, AppProperties.FXML_LOGIN);
     }
 
@@ -110,7 +116,7 @@ public class HomeController implements Initializable {
             if (selected != null) try {
                 selected.delete();
                 clearDetails();
-                User.removeRepository();
+                User.removeRepository(selected);
                 repositoryController.loadRepositories(vbRepository, null);
             } catch (IOException ex) {
                 ExceptionHandler.showException("Error: couldn't delete this repository.", ex);
@@ -153,7 +159,7 @@ public class HomeController implements Initializable {
         }
     }
 
-    private void showRepositoryInfo() {
+    private void waitForSelect() {
         Timeline timeline = new Timeline(new KeyFrame(Duration.millis(100), event -> {
             try {
                 GHRepository selectedRepository = User.getSelectedRepository();
@@ -200,6 +206,15 @@ public class HomeController implements Initializable {
         btnBrowser.setDisable(true);
         btnClone.setDisable(true);
         repositoryController.setSelectedRepository(null);
+    }
+
+    private void loadDemoInfo() {
+        lblRepoName.setText("Demo repository");
+        lblRepoLanguage.setText("Java");
+        lblBranches.setText("2");
+        lblRepoDesc.setText("Just simple demo repo.");
+        lblPrivate.setText("Public");
+        lblRepoCreation.setText("doesn't really exists");
     }
 
 }

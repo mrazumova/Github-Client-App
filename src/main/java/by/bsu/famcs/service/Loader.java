@@ -36,7 +36,7 @@ public class Loader {
         }
     }
 
-    public Stage getStage (MouseEvent event){
+    public Stage getStage(MouseEvent event) {
         Node node = (Node) event.getSource();
         return (Stage) node.getScene().getWindow();
     }

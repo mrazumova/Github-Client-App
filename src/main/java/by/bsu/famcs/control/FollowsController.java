@@ -43,6 +43,22 @@ public class FollowsController {
         }
     }
 
+    public void loadDemo(VBox vBox) {
+        try {
+            vBox.getChildren().clear();
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(AppProperties.FXML_FOLLOWS_ITEM));
+            FollowsController controller = new FollowsController();
+            loader.setController(controller);
+            vBox.getChildren().add(loader.load());
+            controller.lblName.setText("Demo follow");
+            controller.lblUsername.setText("@demo_follow");
+            controller.imAvatar.setImage(new Image(AppProperties.FXML_DEMO_PIC));
+            controller.btnFollow.setText("Unfollow");
+        } catch (Exception e) {
+            ExceptionHandler.showException("Could not load followers & following info for demo user.", e);
+        }
+    }
+
     private void setFollows(GHUser follower) throws IOException {
         follow = follower;
         String name = (follower.getName() != null && !follower.getName().isEmpty() ? follower.getName() : follower.getLogin());

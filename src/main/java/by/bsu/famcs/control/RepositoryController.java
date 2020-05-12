@@ -30,30 +30,6 @@ public class RepositoryController {
         User.setSelectedRepository(repository);
     }
 
-    public void setRepository(GHRepository repo) {
-        repository = repo;
-        if (repo.isFork()) {
-            icon.setIcon(OctIcon.REPO_FORKED);
-            icon.setFill(Paint.valueOf("#6A737D"));
-            lblFork.setText("Forked");
-        } else if (repo.isPrivate()) {
-            icon.setIcon(OctIcon.LOCK);
-            icon.setFill(Paint.valueOf("#DBAB09"));
-            lblFork.setText("Private");
-        } else {
-            icon.setIcon(OctIcon.REPO);
-            icon.setFill(Paint.valueOf("#6A737D"));
-            lblFork.setText("Public");
-        }
-
-        lblRepoName.setText(repo.getName());
-        lblRepoDesc.setText("There are no description.");
-        String desc = repo.getDescription();
-        if (desc != null && !desc.isEmpty()) {
-            lblRepoDesc.setText(desc);
-        }
-    }
-
     public void loadRepositories(VBox vBox, String filter) {
         try {
             Map<String, GHRepository> repositoryMap = User.getRepositories();
@@ -76,6 +52,46 @@ public class RepositoryController {
             }
         } catch (Exception e) {
             ExceptionHandler.showException("Could not load repositories.", e);
+        }
+    }
+
+    public void loadDemo(VBox vBox) {
+        try {
+            vBox.getChildren().clear();
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(AppProperties.FXML_REPO_ITEM));
+            RepositoryController controller = new RepositoryController();
+            loader.setController(controller);
+            vBox.getChildren().add(loader.load());
+            controller.lblRepoName.setText("Demo repository");
+            controller.lblRepoDesc.setText("Just simple demo repo.");
+            controller.lblFork.setText("Public");
+            controller.icon.setIcon(OctIcon.REPO);
+        } catch (Exception e) {
+            ExceptionHandler.showException("Could not repositories info for demo user.", e);
+        }
+    }
+
+    private void setRepository(GHRepository repo) {
+        repository = repo;
+        if (repo.isFork()) {
+            icon.setIcon(OctIcon.REPO_FORKED);
+            icon.setFill(Paint.valueOf("#6A737D"));
+            lblFork.setText("Forked");
+        } else if (repo.isPrivate()) {
+            icon.setIcon(OctIcon.LOCK);
+            icon.setFill(Paint.valueOf("#DBAB09"));
+            lblFork.setText("Private");
+        } else {
+            icon.setIcon(OctIcon.REPO);
+            icon.setFill(Paint.valueOf("#6A737D"));
+            lblFork.setText("Public");
+        }
+
+        lblRepoName.setText(repo.getName());
+        lblRepoDesc.setText("There are no description.");
+        String desc = repo.getDescription();
+        if (desc != null && !desc.isEmpty()) {
+            lblRepoDesc.setText(desc);
         }
     }
 }
