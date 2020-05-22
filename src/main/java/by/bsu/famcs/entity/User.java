@@ -1,12 +1,12 @@
 package by.bsu.famcs.entity;
 
 import by.bsu.famcs.service.ExceptionHandler;
-import by.bsu.famcs.service.Notification;
 import by.bsu.famcs.utils.AppProperties;
 import javafx.scene.image.Image;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.kohsuke.github.*;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,15 +30,11 @@ public class User {
 
     private static GHRepository selectedRepository;
 
-    public static void login(String username, String password) {
-        try {
-            GitHub github = new GitHubBuilder().withPassword(username, password).build();
+    public static void login(String username, String password) throws IOException {
+        GitHub github = new GitHubBuilder().withPassword(username, password).build();
 
-            User.setUser(github.getMyself());
-            setCredentialsProvider(username, password);
-        } catch (Exception e) {
-            new Notification("Error!", "Invalid username or password.");
-        }
+        User.setUser(github.getMyself());
+        setCredentialsProvider(username, password);
     }
 
     public static void setUser(GHUser ghUser) {

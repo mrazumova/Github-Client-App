@@ -10,8 +10,6 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.input.MouseEvent;
-import org.kohsuke.github.GitHub;
-import org.kohsuke.github.GitHubBuilder;
 
 import java.io.IOException;
 import java.net.URL;
@@ -39,7 +37,11 @@ public class LoginController implements Initializable {
         if (username.isEmpty() && password.isEmpty()) {
             new Notification("Error!", "Fields cannot be empty.");
         } else {
-            User.login(username, password);
+            try {
+                User.login(username, password);
+            } catch (IOException e) {
+                new Notification("Error!", "Invalid username or password.");
+            }
             loader.initPage(event, AppProperties.FXML_HOME);
         }
     }
