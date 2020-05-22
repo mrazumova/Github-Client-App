@@ -39,10 +39,10 @@ public class LoginController implements Initializable {
         } else {
             try {
                 User.login(username, password);
+                loader.initPage(event, AppProperties.FXML_HOME);
             } catch (IOException e) {
                 new Notification("Error!", "Invalid username or password.");
             }
-            loader.initPage(event, AppProperties.FXML_HOME);
         }
     }
 
